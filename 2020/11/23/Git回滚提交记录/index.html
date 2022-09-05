@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>Archives |  Notebook</title>
+      <title>Git回滚提交记录 |  Notebook</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -53,84 +53,151 @@
       
     <main class="content on">
       <section class="outer">
-  
-  
-  <article class="articles">
+  <article
+  id="post-Git回滚提交记录"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
     
-    
-    <h1 class="page-type-title">Archives</h1>
-    
-    
-  
-  
-  
-  
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2022" class="archive-year">2022</a>
-    </div>
-    <div class="archives">
-      
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/" class="archive-article-date">
-  <time datetime="2022-08-21T13:32:40.000Z" itemprop="datePublished">08/21</time>
-</a>
+    <header class="article-header">
        
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/"
-    >GitHub SSH配置</a> 
-</h2>
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Git回滚提交记录
+</h1>
  
 
+      
     </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-  
-  </div>
-  </div>
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2020" class="archive-year">2020</a>
-    </div>
-    <div class="archives">
-      
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/" class="archive-article-date">
-  <time datetime="2020-11-23T01:54:41.000Z" itemprop="datePublished">11/23</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/"
-    >Git回滚提交记录</a> 
-</h2>
+     
+    <div class="article-meta">
+      <a href="/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/" class="article-date">
+  <time datetime="2020-11-23T01:54:41.000Z" itemprop="datePublished">2020-11-23</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">601</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">2 min</span>
+        </span>
+    </span>
+</div>
  
-
-    </header>
-    
-    
-  </div>
-</article>
+    </div>
       
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h3 id="1-查看Git提交记录"><a href="#1-查看Git提交记录" class="headerlink" title="1. 查看Git提交记录"></a>1. 查看Git提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
+
+<h3 id="2-回滚本地提交记录"><a href="#2-回滚本地提交记录" class="headerlink" title="2. 回滚本地提交记录"></a>2. 回滚本地提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset [--soft]|[--mixed]|[--hard] &lt;commitID&gt;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th>影响暂存区</th>
+<th>影响工作区</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">git reset –soft <commitId></td>
+<td>N</td>
+<td>N</td>
+<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，并将已提交的文件保存到暂存区。工作区和暂存区中的其他文件不受影响</td>
+</tr>
+<tr>
+<td align="left">git reset –mixed <commitId></td>
+<td>Y</td>
+<td>N</td>
+<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，将已提交的文件保存到工作区，暂存区中的其他文件也将被保存到工作区，即清空了暂存区。–mixed是默认参数，如果git reset 命令不加参数，将使用默认参数–mixed</td>
+</tr>
+<tr>
+<td align="left">git reset –hard <commitId></td>
+<td>Y</td>
+<td>Y</td>
+<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，已提交的文件会丢失，原暂存区和工作区会被清空</td>
+</tr>
+</tbody></table>
+<p>执行上述命令时，除了使用<code>&lt;commitId&gt;</code>以外，也可以使用<code>head</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git reset <span class="built_in">head</span>^</span><br><span class="line">git reset <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 上面两种方式是等效的，即回退本地仓库最近一次的提交，将这次提交中的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line">git reset <span class="built_in">head</span>^^</span><br><span class="line">git reset <span class="built_in">head</span>~2</span><br><span class="line"><span class="comment"># 上面两种方式是等效的，即回退本地仓库最近两次的提交，将这2次提交中的文件恢复到工作区</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-回退远端的提交记录"><a href="#3-回退远端的提交记录" class="headerlink" title="3. 回退远端的提交记录"></a>3. 回退远端的提交记录</h3><p>在回退了本地的提交记录后，远端比本地超前，可使用如下命令将本地分支强制推送到远端</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br><span class="line">或</span><br><span class="line">git push --force</span><br></pre></td></tr></table></figure>
+
+<p>很有可能在推送时会有如下报错</p>
+<blockquote>
+<p>You are not allowed to force push code to a protected branch on this project</p>
+</blockquote>
+<p>可调整仓库配置，允许强制推送。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905122011245.png" alt="image-20220905122011245"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905122037486.png" alt="image-20220905122037486"></p>
+<p>我们可以在个人工程中进行此配置，<em><strong>对于公司里的工程不建议强制推送</strong></em>，可以考虑使用更安全的回滚方式，即 <code>git revert</code> 命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回滚最近一次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚倒数第二次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span>^</span><br><span class="line">git revert <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 注意 git revert 和 git reset 在此处有差异</span></span><br><span class="line"><span class="comment"># git reset head^ 是撤销本地仓库最近一次的提交</span></span><br><span class="line"><span class="comment"># git reset head 用于将暂存区的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚commitId对应的这一次提交</span></span><br><span class="line">git revert &lt;commitId&gt;</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
       
     </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
+
+    </footer>
   </div>
-  
-  
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            GitHub SSH配置
+          
+        </div>
+      </a>
+    
+    
+  </nav>
 
   
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
 </section>
       <footer class="footer">
   <div class="outer">
@@ -242,6 +309,22 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
 
 <script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
 <link
