@@ -1,3 +1,5 @@
+http://example.com/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/
+http://example.com/2023/04/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/
 http://example.com/2022/12/12/Java%E5%86%85%E9%83%A8%E7%B1%BB/
 http://example.com/tags/index.html
 http://example.com/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/

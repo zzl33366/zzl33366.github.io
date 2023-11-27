@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>Git回滚提交记录 |  海阔天空</title>
+      <title>Redis持久化 |  海阔天空</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -54,7 +54,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-Git回滚提交记录"
+  id="post-Redis持久化"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -65,7 +65,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Git回滚提交记录
+  Redis持久化
 </h1>
  
 
@@ -73,15 +73,15 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/" class="article-date">
-  <time datetime="2020-11-23T01:54:41.000Z" itemprop="datePublished">2020-11-23</time>
+      <a href="/2023/04/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" class="article-date">
+  <time datetime="2023-04-02T09:26:09.000Z" itemprop="datePublished">2023-04-02</time>
 </a>   
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">601</span>
+            <span class="post-count">1.5k</span>
         </span>
     </span>
 
@@ -90,7 +90,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">2 min</span>
+            <span class="post-count">5 min</span>
         </span>
     </span>
 </div>
@@ -105,56 +105,60 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h3 id="1-查看Git提交记录"><a href="#1-查看Git提交记录" class="headerlink" title="1. 查看Git提交记录"></a>1. 查看Git提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+  <p>Redis提供了2种持久化的方式，分别为<code>RDB快照</code>和<code>AOF</code>，本文介绍这2种持久化方式的基本用法和原理。</p>
+<h2 id="一、RDB快照"><a href="#一、RDB快照" class="headerlink" title="一、RDB快照"></a>一、RDB快照</h2><h4 id="1-什么是RDB快照"><a href="#1-什么是RDB快照" class="headerlink" title="1. 什么是RDB快照"></a>1. 什么是RDB快照</h4><p>在默认情况下， Redis 将内存数据库快照保存在名字为 dump.rdb 的二进制文件中。可以在redis的配置文件中进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时，自动保存一次数据。例如，以下命令表示<code>60 秒内有至少有 1000 个键被改动</code>时，自动保存一次。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">save 60 1000</span><br></pre></td></tr></table></figure>
 
-<img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
+<p>配置中关于RDB的部分说明如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402154210101.png" alt="image-20230402154210101"></p>
+<p>默认情况下当满足以下三个条件之一时，将触发写入操作：</p>
+<ol>
+<li>每3600秒大于等于1个key的值有变化</li>
+<li>每300秒大于等于100个key的值有变化</li>
+<li>每60秒大于等于10000个key的值有变化</li>
+</ol>
+<p>如果想关闭快照功能，可以注释掉配置文件中 <code>save &lt;second&gt; &lt;changes&gt;</code>的配置或将其配置为<code>save &quot;&quot;</code>即可。</p>
+<h4 id="2-如何手动操作"><a href="#2-如何手动操作" class="headerlink" title="2. 如何手动操作"></a>2. 如何手动操作</h4><p>第一小节中介绍了如何配置快照功能，其实Redis也为我们提供了2个命令，方便使用者手动生成快照文件。分别为<code>save</code>和<code>bgsave</code>，需要注意的是，此处的save是Redis命令（常见的Redis命令有GET、SET等），需在Redis客户端中执行。而第一小节中提到的save是配置文件中的关键字。<code>save</code>和<code>bgsave</code>区别如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402160203093.png" alt="image-20230402160203093"></p>
+<p>bgsave 子进程是由主线程 fork 生成的，可与主线程共享主线程内存中的数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。此时，如果主线程对这些数据做了读操作，那么，主线程和 bgsave 子进程相互不影响。如果主线程要修改数据，这个数据就会被复制一份，生成该数据的副本。然后，bgsave 子进程会把这个副本数据写入 RDB 文件，而在这个过程中，主线程仍然可以直接修改原来的数据。第一小节提到的自动生成RDB文件使用bgsave这种方式。</p>
+<h2 id="二、AOF"><a href="#二、AOF" class="headerlink" title="二、AOF"></a>二、AOF</h2><p>从1.1版本开始，Redis 增加了一种耐久的持久化方式，即AOF。将修改的每一条指令记录到appendonly.aof文件中。</p>
+<h4 id="1-机制示例"><a href="#1-机制示例" class="headerlink" title="1. 机制示例"></a>1. 机制示例</h4><p>示例1，在Redis客户端中执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set test_key test_value</span><br></pre></td></tr></table></figure>
 
-<h3 id="2-回滚本地提交记录"><a href="#2-回滚本地提交记录" class="headerlink" title="2. 回滚本地提交记录"></a>2. 回滚本地提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset [--soft]|[--mixed]|[--hard] &lt;commitID&gt;</span><br></pre></td></tr></table></figure>
+<p>打开数据存储目录中的appendonly.aof文件，发现多了几行数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">*3</span><br><span class="line">$3</span><br><span class="line">set</span><br><span class="line">$8</span><br><span class="line">test_key</span><br><span class="line">$10</span><br><span class="line">test_value</span><br></pre></td></tr></table></figure>
 
-<table>
-<thead>
-<tr>
-<th align="left">命令</th>
-<th>影响暂存区</th>
-<th>影响工作区</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">git reset –soft <commitId></td>
-<td>N</td>
-<td>N</td>
-<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，并将已提交的文件保存到暂存区。工作区和暂存区中的其他文件不受影响</td>
-</tr>
-<tr>
-<td align="left">git reset –mixed <commitId></td>
-<td>Y</td>
-<td>N</td>
-<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，将已提交的文件保存到工作区，暂存区中的其他文件也将被保存到工作区，即清空了暂存区。–mixed是默认参数，如果git reset 命令不加参数，将使用默认参数–mixed</td>
-</tr>
-<tr>
-<td align="left">git reset –hard <commitId></td>
-<td>Y</td>
-<td>Y</td>
-<td>执行此命令后，将当前分支的本地仓库回退到commId对应的那次提交，已提交的文件会丢失，原暂存区和工作区会被清空</td>
-</tr>
-</tbody></table>
-<p>执行上述命令时，除了使用<code>&lt;commitId&gt;</code>以外，也可以使用<code>head</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git reset <span class="built_in">head</span>^</span><br><span class="line">git reset <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 上面两种方式是等效的，即回退本地仓库最近一次的提交，将这次提交中的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line">git reset <span class="built_in">head</span>^^</span><br><span class="line">git reset <span class="built_in">head</span>~2</span><br><span class="line"><span class="comment"># 上面两种方式是等效的，即回退本地仓库最近两次的提交，将这2次提交中的文件恢复到工作区</span></span><br></pre></td></tr></table></figure>
+<p>*3：表示这个命令有3段<br>$3：第一段的长度为3<br>set：第一段的内容为set<br>$8：第二段长度为8<br>test_key：第二段的内容为test_key<br>$10：第三段的长度为10<br>test_value：第三段的内容为test_value</p>
+<p>示例2，在Redis客户端中执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set test_key1 test_value1 EX 60</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-回退远端的提交记录"><a href="#3-回退远端的提交记录" class="headerlink" title="3. 回退远端的提交记录"></a>3. 回退远端的提交记录</h3><p>在回退了本地的提交记录后，远端比本地超前，可使用如下命令将本地分支强制推送到远端</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br><span class="line">或</span><br><span class="line">git push --force</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">*5</span><br><span class="line">$3</span><br><span class="line">SET</span><br><span class="line">$9</span><br><span class="line">test_key1</span><br><span class="line">$11</span><br><span class="line">test_value1</span><br><span class="line">$4</span><br><span class="line">PXAT</span><br><span class="line">$13</span><br><span class="line">1680423887326</span><br></pre></td></tr></table></figure>
 
-<p>很有可能在推送时会有如下报错</p>
-<blockquote>
-<p>You are not allowed to force push code to a protected branch on this project</p>
-</blockquote>
-<p>可调整仓库配置，允许强制推送。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905122011245.png" alt="image-20220905122011245"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20220905122037486.png" alt="image-20220905122037486"></p>
-<p>我们可以在个人工程中进行此配置，<em><strong>对于公司里的工程不建议强制推送</strong></em>，可以考虑使用更安全的回滚方式，即 <code>git revert</code> 命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回滚最近一次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚倒数第二次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span>^</span><br><span class="line">git revert <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 注意 git revert 和 git reset 在此处有差异</span></span><br><span class="line"><span class="comment"># git reset head^ 是撤销本地仓库最近一次的提交</span></span><br><span class="line"><span class="comment"># git reset head 用于将暂存区的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚commitId对应的这一次提交</span></span><br><span class="line">git revert &lt;commitId&gt;</span><br></pre></td></tr></table></figure>
+<p>值得注意的是，AOF文件中并没有像命令一样在aof文件中写入EX 60，而是写入了数据过期的时间戳，单位为ms</p>
+<p>当该key过期时，aof文件中新增了以下数据，删除命令并不是我们手动执行的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">*2</span><br><span class="line">$3</span><br><span class="line">DEL</span><br><span class="line">$9</span><br><span class="line">test_key1</span><br></pre></td></tr></table></figure>
 
+<h4 id="2-详细说明"><a href="#2-详细说明" class="headerlink" title="2. 详细说明"></a>2. 详细说明</h4><p>在第一小节中，我们大致了解了AOF的一些用法，在本小节中将对部分内容进行详细说明。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402161509058.png" alt="image-20230402161509058"></p>
+<p>默认情况下aof功能是关闭的，需要在配置文件中开启，配置为<code>appendonly yes</code>。打开了之后，每当Redis执行修改数据的命令时，其命令对应的信息就会被追加到appendonly.aof文件中，当Redis重新启动时，AOF 文件中的命令将被重新执行，以恢复数据。</p>
+<p>可配置多久写入数据到AOF文件中：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402163617079.png" alt="image-20230402163617079"></p>
+<p>通过上面的介绍，我们知道appendonly.aof文件中保存的都是数据修改的命令。在线上业务场景中使用Redis的INCR命令是非常常见的，我们每自增一次，都向aof文件中保存相同的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">*2</span><br><span class="line">$4</span><br><span class="line">incr</span><br><span class="line">$5</span><br><span class="line">gaga</span><br><span class="line">*2</span><br><span class="line">$4</span><br><span class="line">incr</span><br><span class="line">$5</span><br><span class="line">gaga</span><br></pre></td></tr></table></figure>
+
+<p>浪费了很多磁盘空间，在数据恢复的时候需要处理的原始文件也变得很大。针对这种情况，redis为提供了AOF文件重写的功能，可将本例中的多个incr命令优化为一个set命令，重新记录在appendonly.aof文件中。在redis客户端中执行以下命令即可手动触发AOF文件重写：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bgrewriteaof</span><br></pre></td></tr></table></figure>
+
+<p>触发AOF重写时redis会fork出一个子进程(与bgsave命令类似)，不会对正常命令处理有太多影响。</p>
+<p>比较重要的AOF相关配置有以下2个：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402171047326.png" alt="image-20230402171047326"></p>
+<p>RDB与AOF的对比：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402170346783.png" alt="image-20230402170346783"></p>
+<h2 id="三、Redis-4-0混合持久化"><a href="#三、Redis-4-0混合持久化" class="headerlink" title="三、Redis 4.0混合持久化"></a>三、Redis 4.0混合持久化</h2><p>在Redis启动时如果既有rdb文件，又有aof文件，优先选择aof文件恢复数据，因为理论上aof文件中的数据更全。但如果aof文件比较大，启动时需要花费很长时间，为了解决这个问题，Redis提供了混合持久化的功能。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402171232340.png" alt="image-20230402171232340"></p>
+<p>如果开启了混合持久化后，进行AOF重写时会将重写开始这一刻之前的数据做RDB快照处理，将RDB快照内容和增量的AOF修改内存数据的命令保存在一起，写入新的文件，AOF重写完成后覆盖原来的aof文件。在Redis重启时，先加载文件头部的RDB的内容，再加载文件尾部的AOF日志，使得Redis启动效率大幅提升。</p>
+<p>重写了AOF文件后，再写入几条数据，aof文件中的内容如下，可以看到头部为二进制数据，尾部为原始的AOF日志：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/zzl33366/for_pic_go/img/image-20230402172140709.png" alt="image-20230402172140709"></p>
  
       <!-- reward -->
       
@@ -165,23 +169,26 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
-
     </footer>
   </div>
 
    
   <nav class="article-nav">
     
-      <a href="/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/" class="article-nav-link">
+      <a href="/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            GitHub SSH配置
+            使用Docker搭建Redis主从
           
         </div>
       </a>
     
+    
+      <a href="/2022/12/12/Java%E5%86%85%E9%83%A8%E7%B1%BB/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Java内部类</div>
+      </a>
     
   </nav>
 
