@@ -2,7 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://example.com/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/</loc>
+    <loc>http://example.com/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/</loc>
+    
+    <lastmod>2023-11-27</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://example.com/2022/12/12/Java%E5%86%85%E9%83%A8%E7%B1%BB/</loc>
     
     <lastmod>2023-11-27</lastmod>
     
@@ -13,16 +22,25 @@
   <url>
     <loc>http://example.com/2023/04/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/</loc>
     
-    <lastmod>2023-04-04</lastmod>
+    <lastmod>2023-11-27</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://example.com/2022/12/12/Java%E5%86%85%E9%83%A8%E7%B1%BB/</loc>
+    <loc>http://example.com/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/</loc>
     
-    <lastmod>2022-12-12</lastmod>
+    <lastmod>2023-11-27</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://example.com/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/</loc>
+    
+    <lastmod>2023-11-27</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -32,24 +50,6 @@
     <loc>http://example.com/tags/index.html</loc>
     
     <lastmod>2022-09-05</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://example.com/2020/11/23/Git%E5%9B%9E%E6%BB%9A%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/</loc>
-    
-    <lastmod>2022-09-05</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://example.com/2022/08/21/GitHub%E9%85%8D%E7%BD%AE/</loc>
-    
-    <lastmod>2022-08-23</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
