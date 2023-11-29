@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 
-<meta name="referrer" content="no-referrer" />
-
 
 <html lang="en">
   
@@ -112,7 +110,7 @@
 <p>之前被这个问题困扰过，直到最近看了几篇文章之后，对Java内部类才有了更进一步的认识。</p>
 <p>默认情况下，编译器会为匿名内部类和局部内部类起名为<code>外部类名x.class</code>(x为正整数)，上面这段代码会被编译成2个class文件，Test.class和Test1.class，Test1.class对应test方法中Thread的匿名内部类</p>
 <p>代码中a或者b这2个变量必须由<code>final</code>修饰，否则编译不通过，即局部内部类只能访问局部final变量，为什么有这种限制呢？我们从代码执行的生命周期寻找答案。当test方法执行完毕之后，变量a的生命周期就结束了，而此时Thread对象的生命周期很可能还没有结束，那么在Thread的run方法中继续访问变量a就变成不可能了，但是又要实现这样的效果，怎么办呢？Java采用了<code>复制</code>的手段来解决这个问题。将代码的字节码反编译可以得到下面的内容：</p>
-<img src="http://picgo.zhangzhuolin9527.online/image-20221212165648662.png" alt="image-20221212165648662" style="zoom:50%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20221212165648662.png" alt="image-20221212165648662" style="zoom:50%;" />
 
 <p>在run方法中有一条指令：</p>
 <blockquote>
@@ -123,7 +121,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>  &#123;</span><br><span class="line">         </span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">(<span class="keyword">final</span> <span class="type">int</span> a)</span> &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>()&#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                System.out.println(a);</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>反编译后得到：</p>
-<img src="http://picgo.zhangzhuolin9527.online/image-20221212170303515.png" alt="image-20221212170303515" style="zoom: 33%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20221212170303515.png" alt="image-20221212170303515" style="zoom: 33%;" />
 
 <p>可以看到匿名内部类Test$1的构造器含有两个参数，一个是指向外部类对象的引用，一个是int型变量。显然，这里是将变量test方法中的形参a以参数的形式传进来（变量a的拷贝）进行赋值初始化。</p>
 <p>综合上面2个例子，如果局部变量的值在编译期间就可以确定，则直接在匿名内部类里创建一个拷贝。如果局部变量的值无法在编译期间确定，则通过构造器传参的方式来对拷贝进行初始化赋值。那么在run方法中访问的变量a根本就不是test方法中的局部变量a，这样一来就解决了前面所说的生命周期不一致的问题。</p>

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 
-<meta name="referrer" content="no-referrer" />
-
 
 <html lang="en">
   
@@ -109,7 +107,7 @@
        
   <h3 id="1-查看Git提交记录"><a href="#1-查看Git提交记录" class="headerlink" title="1. 查看Git提交记录"></a>1. 查看Git提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 
-<img src="http://picgo.zhangzhuolin9527.online/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
 
 <h3 id="2-回滚本地提交记录"><a href="#2-回滚本地提交记录" class="headerlink" title="2. 回滚本地提交记录"></a>2. 回滚本地提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset [--soft]|[--mixed]|[--hard] &lt;commitID&gt;</span><br></pre></td></tr></table></figure>
 
@@ -152,8 +150,8 @@
 <p>You are not allowed to force push code to a protected branch on this project</p>
 </blockquote>
 <p>可调整仓库配置，允许强制推送。</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20220905122011245.png" alt="image-20220905122011245"></p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20220905122037486.png" alt="image-20220905122037486"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20220905122011245.png" alt="image-20220905122011245"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20220905122037486.png" alt="image-20220905122037486"></p>
 <p>我们可以在个人工程中进行此配置，<em><strong>对于公司里的工程不建议强制推送</strong></em>，可以考虑使用更安全的回滚方式，即 <code>git revert</code> 命令</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回滚最近一次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚倒数第二次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span>^</span><br><span class="line">git revert <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 注意 git revert 和 git reset 在此处有差异</span></span><br><span class="line"><span class="comment"># git reset head^ 是撤销本地仓库最近一次的提交</span></span><br><span class="line"><span class="comment"># git reset head 用于将暂存区的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚commitId对应的这一次提交</span></span><br><span class="line">git revert &lt;commitId&gt;</span><br></pre></td></tr></table></figure>
 

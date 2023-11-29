@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 
-<meta name="referrer" content="no-referrer" />
-
 
 <html lang="en">
   
@@ -144,17 +142,17 @@
 
 <p>执行wget命令报错，根据域名查询到其对应的IP，修改&#x2F;etc&#x2F;host文件，即可下载成功</p>
 <h4 id="3、创建主-x2F-从节点对应的文件夹"><a href="#3、创建主-x2F-从节点对应的文件夹" class="headerlink" title="3、创建主&#x2F;从节点对应的文件夹"></a>3、创建主&#x2F;从节点对应的文件夹</h4><p>在本机创建主节点和从节点对应的存放数据文件的文件夹，将第2步中下载的配置文件分别拷贝到主&#x2F;从节点对应的文件夹，最终的目录结构如图：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402181203828.png" alt="image-20230402181203828"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402181203828.png" alt="image-20230402181203828"></p>
 <h4 id="4、修改master的配置文件，启动主节点"><a href="#4、修改master的配置文件，启动主节点" class="headerlink" title="4、修改master的配置文件，启动主节点"></a>4、修改master的配置文件，启动主节点</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker run -p 宿主机端口:容器端口</span></span><br><span class="line">docker run -p 6379:6379 \</span><br><span class="line">--name redis_master \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/redis.conf:/etc/redis/redis.conf \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/data:/data \</span><br><span class="line">-d redis redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure>
 
 <p>主节点已启动成功</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402182344782.png" alt="image-20230402182344782"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402182344782.png" alt="image-20230402182344782"></p>
 <h4 id="5、修改slave的配置文件，启动从节点"><a href="#5、修改slave的配置文件，启动从节点" class="headerlink" title="5、修改slave的配置文件，启动从节点"></a>5、修改slave的配置文件，启动从节点</h4><p>查看docker网络配置</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker network ls</span><br><span class="line">docker network inspect bridge</span><br></pre></td></tr></table></figure>
 
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402183058550.png" alt="image-20230402183058550"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402183058550.png" alt="image-20230402183058550"></p>
 <p>可以看到刚刚启动的主节点IPv4地址为<code>172.17.0.2</code>，在修改从节点的配置文件时要配置主节点的IP地址为<code>172.17.0.2</code>，修改的内容有：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br><span class="line">replicaof 172.17.0.2 6379</span><br></pre></td></tr></table></figure>
 
@@ -162,9 +160,9 @@
 
 
 
-<h4 id="6、此时已经启动了主节点和从节点"><a href="#6、此时已经启动了主节点和从节点" class="headerlink" title="6、此时已经启动了主节点和从节点"></a>6、此时已经启动了主节点和从节点</h4><p><img src="http://picgo.zhangzhuolin9527.online/image-20230402190708536.png" alt="image-20230402190708536"></p>
+<h4 id="6、此时已经启动了主节点和从节点"><a href="#6、此时已经启动了主节点和从节点" class="headerlink" title="6、此时已经启动了主节点和从节点"></a>6、此时已经启动了主节点和从节点</h4><p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190708536.png" alt="image-20230402190708536"></p>
 <p>进入主节点对应的redis客户端，查看集群信息，redis主从已搭建成功</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402190813806.png" alt="image-20230402190813806"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190813806.png" alt="image-20230402190813806"></p>
 <p>至此，Redis主从已搭建完成！！</p>
  
       <!-- reward -->
@@ -217,7 +215,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">save 60 1000</span><br></pre></td></tr></table></figure>
 
 <p>配置中关于RDB的部分说明如图：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402154210101.png" alt="image-20230402154210101"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402154210101.png" alt="image-20230402154210101"></p>
 <p>默认情况下当满足以下三个条件之一时，将触发写入操作：</p>
 <ol>
 <li>每3600秒大于等于1个key的值有变化</li>
@@ -226,7 +224,7 @@
 </ol>
 <p>如果想关闭快照功能，可以注释掉配置文件中 <code>save &lt;second&gt; &lt;changes&gt;</code>的配置或将其配置为<code>save &quot;&quot;</code>即可。</p>
 <h4 id="2-如何手动操作"><a href="#2-如何手动操作" class="headerlink" title="2. 如何手动操作"></a>2. 如何手动操作</h4><p>第一小节中介绍了如何配置快照功能，其实Redis也为我们提供了2个命令，方便使用者手动生成快照文件。分别为<code>save</code>和<code>bgsave</code>，需要注意的是，此处的save是Redis命令（常见的Redis命令有GET、SET等），需在Redis客户端中执行。而第一小节中提到的save是配置文件中的关键字。<code>save</code>和<code>bgsave</code>区别如下：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402160203093.png" alt="image-20230402160203093"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402160203093.png" alt="image-20230402160203093"></p>
 <p>bgsave 子进程是由主线程 fork 生成的，可与主线程共享主线程内存中的数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。此时，如果主线程对这些数据做了读操作，那么，主线程和 bgsave 子进程相互不影响。如果主线程要修改数据，这个数据就会被复制一份，生成该数据的副本。然后，bgsave 子进程会把这个副本数据写入 RDB 文件，而在这个过程中，主线程仍然可以直接修改原来的数据。第一小节提到的自动生成RDB文件使用bgsave这种方式。</p>
 <h2 id="二、AOF"><a href="#二、AOF" class="headerlink" title="二、AOF"></a>二、AOF</h2><p>从1.1版本开始，Redis 增加了一种耐久的持久化方式，即AOF。将修改的每一条指令记录到appendonly.aof文件中。</p>
 <h4 id="1-机制示例"><a href="#1-机制示例" class="headerlink" title="1. 机制示例"></a>1. 机制示例</h4><p>示例1，在Redis客户端中执行以下命令：</p>
@@ -246,10 +244,10 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">*2</span><br><span class="line">$3</span><br><span class="line">DEL</span><br><span class="line">$9</span><br><span class="line">test_key1</span><br></pre></td></tr></table></figure>
 
 <h4 id="2-详细说明"><a href="#2-详细说明" class="headerlink" title="2. 详细说明"></a>2. 详细说明</h4><p>在第一小节中，我们大致了解了AOF的一些用法，在本小节中将对部分内容进行详细说明。</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402161509058.png" alt="image-20230402161509058"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402161509058.png" alt="image-20230402161509058"></p>
 <p>默认情况下aof功能是关闭的，需要在配置文件中开启，配置为<code>appendonly yes</code>。打开了之后，每当Redis执行修改数据的命令时，其命令对应的信息就会被追加到appendonly.aof文件中，当Redis重新启动时，AOF 文件中的命令将被重新执行，以恢复数据。</p>
 <p>可配置多久写入数据到AOF文件中：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402163617079.png" alt="image-20230402163617079"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402163617079.png" alt="image-20230402163617079"></p>
 <p>通过上面的介绍，我们知道appendonly.aof文件中保存的都是数据修改的命令。在线上业务场景中使用Redis的INCR命令是非常常见的，我们每自增一次，都向aof文件中保存相同的数据</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">*2</span><br><span class="line">$4</span><br><span class="line">incr</span><br><span class="line">$5</span><br><span class="line">gaga</span><br><span class="line">*2</span><br><span class="line">$4</span><br><span class="line">incr</span><br><span class="line">$5</span><br><span class="line">gaga</span><br></pre></td></tr></table></figure>
 
@@ -258,14 +256,14 @@
 
 <p>触发AOF重写时redis会fork出一个子进程(与bgsave命令类似)，不会对正常命令处理有太多影响。</p>
 <p>比较重要的AOF相关配置有以下2个：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402171047326.png" alt="image-20230402171047326"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402171047326.png" alt="image-20230402171047326"></p>
 <p>RDB与AOF的对比：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402170346783.png" alt="image-20230402170346783"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402170346783.png" alt="image-20230402170346783"></p>
 <h2 id="三、Redis-4-0混合持久化"><a href="#三、Redis-4-0混合持久化" class="headerlink" title="三、Redis 4.0混合持久化"></a>三、Redis 4.0混合持久化</h2><p>在Redis启动时如果既有rdb文件，又有aof文件，优先选择aof文件恢复数据，因为理论上aof文件中的数据更全。但如果aof文件比较大，启动时需要花费很长时间，为了解决这个问题，Redis提供了混合持久化的功能。</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402171232340.png" alt="image-20230402171232340"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402171232340.png" alt="image-20230402171232340"></p>
 <p>如果开启了混合持久化后，进行AOF重写时会将重写开始这一刻之前的数据做RDB快照处理，将RDB快照内容和增量的AOF修改内存数据的命令保存在一起，写入新的文件，AOF重写完成后覆盖原来的aof文件。在Redis重启时，先加载文件头部的RDB的内容，再加载文件尾部的AOF日志，使得Redis启动效率大幅提升。</p>
 <p>重写了AOF文件后，再写入几条数据，aof文件中的内容如下，可以看到头部为二进制数据，尾部为原始的AOF日志：</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20230402172140709.png" alt="image-20230402172140709"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402172140709.png" alt="image-20230402172140709"></p>
  
       <!-- reward -->
       
@@ -317,7 +315,7 @@
 <p>之前被这个问题困扰过，直到最近看了几篇文章之后，对Java内部类才有了更进一步的认识。</p>
 <p>默认情况下，编译器会为匿名内部类和局部内部类起名为<code>外部类名x.class</code>(x为正整数)，上面这段代码会被编译成2个class文件，Test.class和Test1.class，Test1.class对应test方法中Thread的匿名内部类</p>
 <p>代码中a或者b这2个变量必须由<code>final</code>修饰，否则编译不通过，即局部内部类只能访问局部final变量，为什么有这种限制呢？我们从代码执行的生命周期寻找答案。当test方法执行完毕之后，变量a的生命周期就结束了，而此时Thread对象的生命周期很可能还没有结束，那么在Thread的run方法中继续访问变量a就变成不可能了，但是又要实现这样的效果，怎么办呢？Java采用了<code>复制</code>的手段来解决这个问题。将代码的字节码反编译可以得到下面的内容：</p>
-<img src="http://picgo.zhangzhuolin9527.online/image-20221212165648662.png" alt="image-20221212165648662" style="zoom:50%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20221212165648662.png" alt="image-20221212165648662" style="zoom:50%;" />
 
 <p>在run方法中有一条指令：</p>
 <blockquote>
@@ -328,7 +326,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>  &#123;</span><br><span class="line">         </span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">(<span class="keyword">final</span> <span class="type">int</span> a)</span> &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>()&#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                System.out.println(a);</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>反编译后得到：</p>
-<img src="http://picgo.zhangzhuolin9527.online/image-20221212170303515.png" alt="image-20221212170303515" style="zoom: 33%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20221212170303515.png" alt="image-20221212170303515" style="zoom: 33%;" />
 
 <p>可以看到匿名内部类Test$1的构造器含有两个参数，一个是指向外部类对象的引用，一个是int型变量。显然，这里是将变量test方法中的形参a以参数的形式传进来（变量a的拷贝）进行赋值初始化。</p>
 <p>综合上面2个例子，如果局部变量的值在编译期间就可以确定，则直接在匿名内部类里创建一个拷贝。如果局部变量的值无法在编译期间确定，则通过构造器传参的方式来对拷贝进行初始化赋值。那么在run方法中访问的变量a根本就不是test方法中的局部变量a，这样一来就解决了前面所说的生命周期不一致的问题。</p>
@@ -447,7 +445,7 @@ PreferredAuthentications publickey
        
   <h3 id="1-查看Git提交记录"><a href="#1-查看Git提交记录" class="headerlink" title="1. 查看Git提交记录"></a>1. 查看Git提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 
-<img src="http://picgo.zhangzhuolin9527.online/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
+<img src="https://picgo.zhangzhuolin9527.online/image-20220905112011366.png" alt="image-20220905112011366" style="zoom:50%;" />
 
 <h3 id="2-回滚本地提交记录"><a href="#2-回滚本地提交记录" class="headerlink" title="2. 回滚本地提交记录"></a>2. 回滚本地提交记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset [--soft]|[--mixed]|[--hard] &lt;commitID&gt;</span><br></pre></td></tr></table></figure>
 
@@ -490,8 +488,8 @@ PreferredAuthentications publickey
 <p>You are not allowed to force push code to a protected branch on this project</p>
 </blockquote>
 <p>可调整仓库配置，允许强制推送。</p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20220905122011245.png" alt="image-20220905122011245"></p>
-<p><img src="http://picgo.zhangzhuolin9527.online/image-20220905122037486.png" alt="image-20220905122037486"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20220905122011245.png" alt="image-20220905122011245"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20220905122037486.png" alt="image-20220905122037486"></p>
 <p>我们可以在个人工程中进行此配置，<em><strong>对于公司里的工程不建议强制推送</strong></em>，可以考虑使用更安全的回滚方式，即 <code>git revert</code> 命令</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回滚最近一次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚倒数第二次的提交</span></span><br><span class="line">git revert <span class="built_in">head</span>^</span><br><span class="line">git revert <span class="built_in">head</span>~1</span><br><span class="line"><span class="comment"># 注意 git revert 和 git reset 在此处有差异</span></span><br><span class="line"><span class="comment"># git reset head^ 是撤销本地仓库最近一次的提交</span></span><br><span class="line"><span class="comment"># git reset head 用于将暂存区的文件恢复到工作区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回滚commitId对应的这一次提交</span></span><br><span class="line">git revert &lt;commitId&gt;</span><br></pre></td></tr></table></figure>
 
