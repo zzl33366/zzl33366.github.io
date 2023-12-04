@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>使用Docker搭建Redis主从 |  海阔天空</title>
+      <title>Archives: 2023/12 |  海阔天空</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -53,133 +53,73 @@
       
     <main class="content on">
       <section class="outer">
-  <article
-  id="post-使用Docker搭建Redis主从"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
+  
+  
+  <article class="articles">
     
-    <header class="article-header">
+    
+    <h1 class="page-type-title">2023/12</h1>
+    
+    
+  
+  
+  
+  
+  
+  
+  <div class="archives-wrap">
+    <div class="archive-year-wrap">
+      <a href="/archives/2023" class="archive-year">2023</a>
+    </div>
+    <div class="archives">
+      
+      <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2023/12/04/ThreadLocal%E4%B8%8E%E5%BC%B1%E5%BC%95%E7%94%A8/" class="archive-article-date">
+  <time datetime="2023-12-04T08:55:08.000Z" itemprop="datePublished">12/04</time>
+</a>
        
-<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  使用Docker搭建Redis主从
-</h1>
+<h2 itemprop="name">
+  <a class="archive-article-title" href="/2023/12/04/ThreadLocal%E4%B8%8E%E5%BC%B1%E5%BC%95%E7%94%A8/"
+    >ThreadLocal与弱引用</a> 
+</h2>
  
 
-      
     </header>
-     
-    <div class="article-meta">
-      <a href="/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/" class="article-date">
-  <time datetime="2023-04-02T09:31:32.000Z" itemprop="datePublished">2023-04-02</time>
-</a>   
-<div class="word_count">
-    <span class="post-time">
-        <span class="post-meta-item-icon">
-            <i class="ri-quill-pen-line"></i>
-            <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">474</span>
-        </span>
-    </span>
-
-    <span class="post-time">
-        &nbsp; | &nbsp;
-        <span class="post-meta-item-icon">
-            <i class="ri-book-open-line"></i>
-            <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">2 min</span>
-        </span>
-    </span>
-</div>
- 
-    </div>
-      
-    <div class="tocbot"></div>
-
-
-
-
-  
-    <div class="article-entry" itemprop="articleBody">
-       
-  <p>操作系统：windows11 WSL Ubuntu 20.04 LTS</p>
-<h4 id="1、下载Docker-Redis镜像"><a href="#1、下载Docker-Redis镜像" class="headerlink" title="1、下载Docker Redis镜像"></a>1、下载Docker Redis镜像</h4><h4 id="2、下载镜像版本对应的redis-conf配置文件"><a href="#2、下载镜像版本对应的redis-conf配置文件" class="headerlink" title="2、下载镜像版本对应的redis.conf配置文件"></a>2、下载镜像版本对应的redis.conf配置文件</h4><p>笔者使用<code>docker pull redis</code>下载的redis版本号是6.2，那么应该下载6.2版本对应的redis.conf</p>
-<p>Redis官网配置文件页面链接：<a target="_blank" rel="noopener" href="https://redis.io/docs/management/config/">https://redis.io/docs/management/config/</a> ，在此页面中找到对应版本的配置文件链接，下载配置文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/redis/redis/6.2/redis.conf</span><br></pre></td></tr></table></figure>
-
-<p>执行wget命令报错，根据域名查询到其对应的IP，修改&#x2F;etc&#x2F;host文件，即可下载成功</p>
-<h4 id="3、创建主-x2F-从节点对应的文件夹"><a href="#3、创建主-x2F-从节点对应的文件夹" class="headerlink" title="3、创建主&#x2F;从节点对应的文件夹"></a>3、创建主&#x2F;从节点对应的文件夹</h4><p>在本机创建主节点和从节点对应的存放数据文件的文件夹，将第2步中下载的配置文件分别拷贝到主&#x2F;从节点对应的文件夹，最终的目录结构如图：</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402181203828.png" alt="image-20230402181203828"></p>
-<h4 id="4、修改master的配置文件，启动主节点"><a href="#4、修改master的配置文件，启动主节点" class="headerlink" title="4、修改master的配置文件，启动主节点"></a>4、修改master的配置文件，启动主节点</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker run -p 宿主机端口:容器端口</span></span><br><span class="line">docker run -p 6379:6379 \</span><br><span class="line">--name redis_master \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/redis.conf:/etc/redis/redis.conf \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/data:/data \</span><br><span class="line">-d redis redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure>
-
-<p>主节点已启动成功</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402182344782.png" alt="image-20230402182344782"></p>
-<h4 id="5、修改slave的配置文件，启动从节点"><a href="#5、修改slave的配置文件，启动从节点" class="headerlink" title="5、修改slave的配置文件，启动从节点"></a>5、修改slave的配置文件，启动从节点</h4><p>查看docker网络配置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker network ls</span><br><span class="line">docker network inspect bridge</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402183058550.png" alt="image-20230402183058550"></p>
-<p>可以看到刚刚启动的主节点IPv4地址为<code>172.17.0.2</code>，在修改从节点的配置文件时要配置主节点的IP地址为<code>172.17.0.2</code>，修改的内容有：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br><span class="line">replicaof 172.17.0.2 6379</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 6380:6379 \</span><br><span class="line">--name redis_slave \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_slave/redis.conf:/etc/redis/redis.conf \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_slave/data:/data \</span><br><span class="line">-d redis redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="6、此时已经启动了主节点和从节点"><a href="#6、此时已经启动了主节点和从节点" class="headerlink" title="6、此时已经启动了主节点和从节点"></a>6、此时已经启动了主节点和从节点</h4><p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190708536.png" alt="image-20230402190708536"></p>
-<p>进入主节点对应的redis客户端，查看集群信息，redis主从已搭建成功</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190813806.png" alt="image-20230402190813806"></p>
-<p>至此，Redis主从已搭建完成！！</p>
- 
-      <!-- reward -->
-      
-    </div>
     
-
-    <!-- copyright -->
     
-    <footer class="article-footer">
-       
-    </footer>
   </div>
+</article>
+      
+  
+  
+      <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2023/12/04/Java%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B/" class="archive-article-date">
+  <time datetime="2023-12-04T06:00:22.000Z" itemprop="datePublished">12/04</time>
+</a>
+       
+<h2 itemprop="name">
+  <a class="archive-article-title" href="/2023/12/04/Java%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B/"
+    >Java的四种引用类型</a> 
+</h2>
+ 
 
-   
-  <nav class="article-nav">
-    
-      <a href="/2023/12/04/Java%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            Java的四种引用类型
-          
-        </div>
-      </a>
+    </header>
     
     
-      <a href="/2023/04/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" class="article-nav-link">
-        <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Redis持久化</div>
-      </a>
-    
-  </nav>
+  </div>
+</article>
+      
+      
+    </div>
+  </div>
+  
+  
 
   
-   
-    
-    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
-    <div id="twikoo" class="twikoo"></div>
-    <script>
-        twikoo.init({
-            envId: ""
-        })
-    </script>
- 
-</article>
-
 </section>
       <footer class="footer">
   <div class="outer">
@@ -291,22 +231,6 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
- 
-<script src="/js/tocbot.min.js"></script>
-
-<script>
-  tocbot.init({
-    tocSelector: ".tocbot",
-    contentSelector: ".article-entry",
-    headingSelector: "h1, h2, h3, h4, h5, h6",
-    hasInnerContainers: true,
-    scrollSmooth: true,
-    scrollContainer: "main",
-    positionFixedSelector: ".tocbot",
-    positionFixedClass: "is-position-fixed",
-    fixedSidebarOffset: "auto",
-  });
-</script>
 
 <script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
 <link

@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>使用Docker搭建Redis主从 |  海阔天空</title>
+      <title>ThreadLocal与弱引用 |  海阔天空</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -54,7 +54,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-使用Docker搭建Redis主从"
+  id="post-ThreadLocal与弱引用"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -65,7 +65,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  使用Docker搭建Redis主从
+  ThreadLocal与弱引用
 </h1>
  
 
@@ -73,15 +73,15 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2023/04/02/%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis%E4%B8%BB%E4%BB%8E/" class="article-date">
-  <time datetime="2023-04-02T09:31:32.000Z" itemprop="datePublished">2023-04-02</time>
+      <a href="/2023/12/04/ThreadLocal%E4%B8%8E%E5%BC%B1%E5%BC%95%E7%94%A8/" class="article-date">
+  <time datetime="2023-12-04T08:55:08.000Z" itemprop="datePublished">2023-12-04</time>
 </a>   
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">474</span>
+            <span class="post-count">1.3k</span>
         </span>
     </span>
 
@@ -90,7 +90,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">2 min</span>
+            <span class="post-count">4 min</span>
         </span>
     </span>
 </div>
@@ -105,35 +105,52 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>操作系统：windows11 WSL Ubuntu 20.04 LTS</p>
-<h4 id="1、下载Docker-Redis镜像"><a href="#1、下载Docker-Redis镜像" class="headerlink" title="1、下载Docker Redis镜像"></a>1、下载Docker Redis镜像</h4><h4 id="2、下载镜像版本对应的redis-conf配置文件"><a href="#2、下载镜像版本对应的redis-conf配置文件" class="headerlink" title="2、下载镜像版本对应的redis.conf配置文件"></a>2、下载镜像版本对应的redis.conf配置文件</h4><p>笔者使用<code>docker pull redis</code>下载的redis版本号是6.2，那么应该下载6.2版本对应的redis.conf</p>
-<p>Redis官网配置文件页面链接：<a target="_blank" rel="noopener" href="https://redis.io/docs/management/config/">https://redis.io/docs/management/config/</a> ，在此页面中找到对应版本的配置文件链接，下载配置文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/redis/redis/6.2/redis.conf</span><br></pre></td></tr></table></figure>
+  <p>ThreadLocal的机制是复制一份变量的副本，每个线程只访问自己持有的这个变量的副本，一定程度上消除了并发带来的一些问题。是除了加锁等方式之外消除“竞态”的方案。</p>
+<h3 id="ThreadLocal与弱引用"><a href="#ThreadLocal与弱引用" class="headerlink" title="ThreadLocal与弱引用"></a>ThreadLocal与弱引用</h3><p>ThreadLocal使用示例代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadLocalDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ThreadLocal&lt;String&gt; threadLocalString =  <span class="keyword">new</span> <span class="title class_">ThreadLocal</span>&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">      	<span class="comment">// 主线程设置 threadLocalString 值为 hello world main</span></span><br><span class="line">        ThreadLocalDemo.threadLocalString.set(<span class="string">&quot;hello world main&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;创建新线程前，主线程&quot;</span> + Thread.currentThread().getName() + <span class="string">&quot;的threadlocal字符值为：&quot;</span>  + ThreadLocalDemo.threadLocalString.get());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Thread</span> <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                    <span class="comment">// 在主线程中创建新线程，在新线程中设置 threadLocalString 值为 new thread</span></span><br><span class="line">                    ThreadLocalDemo.threadLocalString.set(<span class="string">&quot;new thread&quot;</span>);</span><br><span class="line">                    System.out.println(<span class="string">&quot;新线程&quot;</span> + Thread.currentThread().getName() + <span class="string">&quot;的threadlocal字符值为：&quot;</span> + ThreadLocalDemo.threadLocalString.get());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            thread.start();</span><br><span class="line">          	<span class="comment">// 主线程等待新线程执行完毕后，再继续执行后续代码</span></span><br><span class="line">            thread.join();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(e);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;创建新线程后，主线程&quot;</span> + Thread.currentThread().getName() + <span class="string">&quot;的threadlocal字符值为：&quot;</span>  + ThreadLocalDemo.threadLocalString.get());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>执行wget命令报错，根据域名查询到其对应的IP，修改&#x2F;etc&#x2F;host文件，即可下载成功</p>
-<h4 id="3、创建主-x2F-从节点对应的文件夹"><a href="#3、创建主-x2F-从节点对应的文件夹" class="headerlink" title="3、创建主&#x2F;从节点对应的文件夹"></a>3、创建主&#x2F;从节点对应的文件夹</h4><p>在本机创建主节点和从节点对应的存放数据文件的文件夹，将第2步中下载的配置文件分别拷贝到主&#x2F;从节点对应的文件夹，最终的目录结构如图：</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402181203828.png" alt="image-20230402181203828"></p>
-<h4 id="4、修改master的配置文件，启动主节点"><a href="#4、修改master的配置文件，启动主节点" class="headerlink" title="4、修改master的配置文件，启动主节点"></a>4、修改master的配置文件，启动主节点</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br></pre></td></tr></table></figure>
+<p>执行结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">创建新线程前，主线程main的threadlocal字符值为：hello world main</span><br><span class="line">新线程Thread-0的threadlocal字符值为：new thread</span><br><span class="line">创建新线程后，主线程main的threadlocal字符值为：hello world main</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">docker run -p 宿主机端口:容器端口</span></span><br><span class="line">docker run -p 6379:6379 \</span><br><span class="line">--name redis_master \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/redis.conf:/etc/redis/redis.conf \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_master/data:/data \</span><br><span class="line">-d redis redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure>
-
-<p>主节点已启动成功</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402182344782.png" alt="image-20230402182344782"></p>
-<h4 id="5、修改slave的配置文件，启动从节点"><a href="#5、修改slave的配置文件，启动从节点" class="headerlink" title="5、修改slave的配置文件，启动从节点"></a>5、修改slave的配置文件，启动从节点</h4><p>查看docker网络配置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker network ls</span><br><span class="line">docker network inspect bridge</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402183058550.png" alt="image-20230402183058550"></p>
-<p>可以看到刚刚启动的主节点IPv4地址为<code>172.17.0.2</code>，在修改从节点的配置文件时要配置主节点的IP地址为<code>172.17.0.2</code>，修改的内容有：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#bind 127.0.0.1</span><br><span class="line">appendonly yes</span><br><span class="line">protected-mode no</span><br><span class="line">replicaof 172.17.0.2 6379</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 6380:6379 \</span><br><span class="line">--name redis_slave \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_slave/redis.conf:/etc/redis/redis.conf \</span><br><span class="line">-v /home/zhangzhuolin/test_redis/redis_slave/data:/data \</span><br><span class="line">-d redis redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="6、此时已经启动了主节点和从节点"><a href="#6、此时已经启动了主节点和从节点" class="headerlink" title="6、此时已经启动了主节点和从节点"></a>6、此时已经启动了主节点和从节点</h4><p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190708536.png" alt="image-20230402190708536"></p>
-<p>进入主节点对应的redis客户端，查看集群信息，redis主从已搭建成功</p>
-<p><img src="https://picgo.zhangzhuolin9527.online/image-20230402190813806.png" alt="image-20230402190813806"></p>
-<p>至此，Redis主从已搭建完成！！</p>
+<p>根据代码执行结果得知，在新创建的线程中对 threadLocalString 的值进行修改，并不影响主线程中之前对 threadLocalString 所设置的值。说明在新创建的线程中对 threadLocalString 重新设置值，只是修改了此变量（在当前线程中）的副本的值。</p>
+<p>下文中将使用图来进一步说明。</p>
+<ol>
+<li><p>程序启动，完成了类加载后，栈内存和堆内存</p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204172623488.png" alt="image-20231204172623488"></p>
+<p>主线程栈中的ThreadLocal的引用指向堆中的ThreadLocal对象(也可称为ThreadLocal实例)，值得注意的是，此时这个ThreadLocal对象并没有值，因为实例化时并未设置初始值</p>
+</li>
+<li><p>在main方法中执行以下代码，在主线程中为threadLocalString赋值</p>
+<blockquote>
+<p>ThreadLocalDemo.threadLocalString.set(“hello world main”);</p>
+</blockquote>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204173120364.png" alt="image-20231204173120364"></p>
+<p>在这一步中，主线程的ThreadLocalMap（详见Thread类的threadLocals变量）进行初始化，ThreadLocalMap中有一键值对，此键值对的key指向ThreadLocal对象，即第1步中创建的ThreadLocal对象，不过这个引用是弱引用，弱引用的特点是，进行GC时，无论内存是否足够，仅被弱引用指向的对象一定会被回收</p>
+</li>
+<li><p>在main方法中创建新线程，在新线程中为threadLocalString赋值</p>
+<blockquote>
+<p>ThreadLocalDemo.threadLocalString.set(“new thread”);</p>
+</blockquote>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204174129995.png" alt="image-20231204174129995"></p>
+<p>主线程中创建了新线程，在新线程中为threadLocalString赋值，赋值时，初始化了新线程的ThreadLocalMap，该map中同样持有一键值对，此键值对的key指向ThreadLocal对象（弱引用）。通过DEBUG得知，在主线程和新线程中，它们的ThreadLocalMap中，threadLocalString的key确实是同一个对象</p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204174954573.png" alt="image-20231204174954573"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204175028675.png" alt="image-20231204175028675"></p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204175047167.png" alt="image-20231204175047167"></p>
+</li>
+<li><p>如果主线程和新线程的ThreadLocalMap中key都以强引用的方式指向ThreadLocal实例。我们主动释放两个线程对于ThreadLocal对象的引用</p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204175746702.png" alt="image-20231204175746702"></p>
+<p>两个线程都主动释放掉了对ThreadLocal对象的引用，但是，从主线程thread引用-&gt;ThreadLocal对象，依然存在这一条可达路径。JVM判断一个对象是否可回收的算法通常为可达路径算法。可达路径算法以GCROOT出发，如果存在一条通向某个对象的强引用通路，那么这个对象是永远不会回收的。thread的引用是主线程的一个本地变量，根据GCROOT算法，thread的引用是可以作为一个GCROOT的。我们显式地释放掉了threadLocal的引用(ThreadLocalDemo.threadLocal &#x3D; null;)，因为我们确认后续我们不会使用到它了，但是，由于存在GCROOT的一条可达通路，程序并没有像我们希望的那样立刻释放掉ThreadLocal对象，直到我们所有的线程都释放掉了，即程序结束，ThreadLocal对象才会被真正的释放掉，这无疑是内存泄露。</p>
+</li>
+<li><p>若使用弱引用</p>
+<p><img src="https://picgo.zhangzhuolin9527.online/image-20231204180323967.png" alt="image-20231204180323967"></p>
+<p>如上图所示，由于ThreadLocal对象仅被弱引用指向，所以在下一次GC的时候，ThreadLocal对象会被回收。ThreadLocal对象被回收后，主线程和新线程的本例提到的Entry key值变为空，但这个value不能再被访问了，只有当线程执行结束后，对应的value才会被回收。在调用ThreadLocal的get(), set(), remove() 方法的时候都会清除线程ThreadLocalMap里所有key为null的value，减少内存泄漏情况的发生。</p>
+</li>
+</ol>
+<h3 id="ThreadLocal最佳实践"><a href="#ThreadLocal最佳实践" class="headerlink" title="ThreadLocal最佳实践"></a>ThreadLocal最佳实践</h3><p>实际应用中我们会用线程池去维护线程，通常会设置一些核心线程，且不自动销毁，这时内存泄漏值得注意。expungeStaleEntry、cleanSomeSlots、replaceStaleEntry、set、get、remove这些方法都对key为null的entry进行了处理，在使用中注意以下几点</p>
+<ol>
+<li>把ThreadLocal变量修饰为<code>static</code></li>
+<li>初始化避免空指针问题：ThreadLocal.withInitial(()-&gt; 初始化值);</li>
+<li>使用完成之后，手动<code>remove</code></li>
+</ol>
  
       <!-- reward -->
       
@@ -150,19 +167,10 @@
    
   <nav class="article-nav">
     
+    
       <a href="/2023/12/04/Java%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            Java的四种引用类型
-          
-        </div>
-      </a>
-    
-    
-      <a href="/2023/04/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Redis持久化</div>
+        <div class="article-nav-title">Java的四种引用类型</div>
       </a>
     
   </nav>
