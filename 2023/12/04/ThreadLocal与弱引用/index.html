@@ -81,7 +81,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">1.3k</span>
+            <span class="post-count">1.5k</span>
         </span>
     </span>
 
@@ -90,7 +90,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">4 min</span>
+            <span class="post-count">5 min</span>
         </span>
     </span>
 </div>
@@ -145,11 +145,14 @@
 <p>如上图所示，由于ThreadLocal对象仅被弱引用指向，所以在下一次GC的时候，ThreadLocal对象会被回收。ThreadLocal对象被回收后，主线程和新线程的本例提到的Entry key值变为空，但这个value不能再被访问了，只有当线程执行结束后，对应的value才会被回收。在调用ThreadLocal的get(), set(), remove() 方法的时候都会清除线程ThreadLocalMap里所有key为null的value，减少内存泄漏情况的发生。</p>
 </li>
 </ol>
-<h3 id="ThreadLocal最佳实践"><a href="#ThreadLocal最佳实践" class="headerlink" title="ThreadLocal最佳实践"></a>ThreadLocal最佳实践</h3><p>实际应用中我们会用线程池去维护线程，通常会设置一些核心线程，且不自动销毁，这时内存泄漏值得注意。expungeStaleEntry、cleanSomeSlots、replaceStaleEntry、set、get、remove这些方法都对key为null的entry进行了处理，在使用中注意以下几点</p>
+<h3 id="ThreadLocal造成内存泄漏"><a href="#ThreadLocal造成内存泄漏" class="headerlink" title="ThreadLocal造成内存泄漏"></a>ThreadLocal造成内存泄漏</h3><p>内存泄漏的定义：程序中动态分配的堆内存由于某种原因未释放或无法释放，造成系统内存的浪费，导致程序运行速度减慢甚至系统崩溃等严重后果。</p>
+<p>根据上个章节末尾的描述，ThreadLocalMap中，其键值对的key以弱引用指向ThreadLocal对象，如果一个ThreadLocal对象没有强引用指向它，在GC时，ThreadLocal对象会被回收，此时键值对的key值为null。如果当前线程迟迟不结束或不再修改ThreadLocalMap（不修改ThreadLocalMap就无法触发清除无用键值对的机制），这些key为null的键值对一直存在一条强引用链：<code>Thread引用 -&gt; Thread对象 -&gt; ThreadLocalMap -&gt; Entry -&gt; value</code> 永远无法回收，造成内存泄漏。</p>
+<p>总得来说，ThreadLocalMap内存泄漏的根本原因是，ThreadLocalMap的生命周期与Thread一样长，如果在使用过后未手动删除对应的key，就有可能出现内存泄漏。</p>
+<h3 id="ThreadLocal最佳实践"><a href="#ThreadLocal最佳实践" class="headerlink" title="ThreadLocal最佳实践"></a>ThreadLocal最佳实践</h3><p>实际应用中我们会用线程池去维护线程，通常会设置一些核心线程，且不自动销毁，这时需要注意内存泄漏的问题。expungeStaleEntry、cleanSomeSlots、replaceStaleEntry、set、get、remove这些方法都对key为null的entry进行了处理，但这只是官方提供的兜底方案，不应该过度依赖此机制。在使用中注意以下几点：</p>
 <ol>
-<li>把ThreadLocal变量修饰为<code>static</code></li>
-<li>初始化避免空指针问题：ThreadLocal.withInitial(()-&gt; 初始化值);</li>
 <li>使用完成之后，手动<code>remove</code></li>
+<li>初始化避免空指针问题：ThreadLocal.withInitial(()-&gt; 初始化值);</li>
+<li>把ThreadLocal变量修饰为<code>static</code></li>
 </ol>
  
       <!-- reward -->
@@ -161,11 +164,22 @@
     
     <footer class="article-footer">
        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/" rel="tag">Java</a></li></ul>
+
     </footer>
   </div>
 
    
   <nav class="article-nav">
+    
+      <a href="/2023/12/13/%E5%85%AB%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%80%E4%BB%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            八种常见的数据结构简介
+          
+        </div>
+      </a>
     
     
       <a href="/2023/12/04/Java%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
